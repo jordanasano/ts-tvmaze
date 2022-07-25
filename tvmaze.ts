@@ -4,6 +4,7 @@ import * as $ from 'jquery';
 const $showsList: JQuery = $("#showsList");
 const $episodesArea: JQuery = $("#episodesArea");
 const $searchForm: JQuery = $("#searchForm");
+const $episodeBtn: JQuery = $(".Show-getEpisodes");
 const TVMAZE_API_URL: string = "http://api.tvmaze.com/";
 
 interface ShowInterface {
@@ -88,50 +89,49 @@ $searchForm.on("submit", async function (evt) {
   await searchForShowAndDisplay();
 });
 
+$showsList.on("click", async function (evt) {
+  evt.preventDefault();
+  console.log(evt);
+ // await getEpisodesOfShow(evt.target.id);
+});
+
 
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id:number): Promise<EpisodeInterface[]> { 
-//   const response = await axios.get(`${TVMAZE_API_URL}shows/${id}/episodes`);
-//   const shows = response.data;
+async function getEpisodesOfShow(id:number): Promise<EpisodeInterface[]> { 
+  const response = await axios.get(`${TVMAZE_API_URL}shows/${id}/episodes`);
+  const episodes = response.data;
 
-//   return shows.map((show: Record<string, any>) => {
-//     return {
-//       id: show.id,
-//       name: show.name,
-//       season: show.season,
-//       number: show.number
-//     }
-//   });
-// }
+  return episodes.map((episode: Record<string, any>): EpisodeInterface => {
+    return {
+      id: episode.id,
+      name: episode.name,
+      season: episode.season,
+      number: episode.number
+    }
+  });
+}
 
 /** Write a clear docstring for this function... */
 
-function populateEpisodes(episodes) { 
-  $showsList.empty();
+function populateEpisodes(episodes: EpisodeInterface[]): void { 
+  $episodesArea.empty();
 
-  for (let show of shows) {
-    console.log('image =', show.image);
-    const $show: JQuery = $(
-      `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
+  for (let episode of episodes) {
+    const $episode: JQuery = $(
+      `<div data-show-id="${episode.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
-           <img
-              src=${show.image.original}
-              alt=${show.name}
-              class="w-25 me-3">
            <div class="media-body">
-             <h5 class="text-primary">${show.name}</h5>
-             <div><small>${show.summary}</small></div>
-             <button class="btn btn-outline-light btn-sm Show-getEpisodes">
-               Episodes
-             </button>
+             <h5 class="text-primary">${episode.name}</h5>
+             <div><small>${episode.season}</small></div>
+             <div><small>Episode: ${episode.number}</small></div>
            </div>
          </div>
        </div>
       `);
 
-    $showsList.append($show);
+    $episodesArea.append($episode);
   }
 }
