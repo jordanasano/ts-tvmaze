@@ -1,10 +1,16 @@
 import axios from "axios";
 import * as $ from 'jquery';
 
-const $showsList = $("#showsList");
-const $episodesArea = $("#episodesArea");
-const $searchForm = $("#searchForm");
+const $showsList: JQuery = $("#showsList");
+const $episodesArea: JQuery = $("#episodesArea");
+const $searchForm: JQuery = $("#searchForm");
 
+interface ShowInterface {
+  id: number,
+  name: string,
+  summary: string,
+  image: string
+};
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -13,7 +19,7 @@ const $searchForm = $("#searchForm");
  *    (if no image URL given by API, put in a default image URL)
  */
 
-async function getShowsByTerm(term) {
+async function getShowsByTerm(term: string): Promise<ShowInterface[]> {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
   return [
     {
@@ -38,11 +44,11 @@ async function getShowsByTerm(term) {
 
 /** Given list of shows, create markup for each and to DOM */
 
-function populateShows(shows) {
+function populateShows(shows: ShowInterface[]): void {
   $showsList.empty();
 
   for (let show of shows) {
-    const $show = $(
+    const $show: JQuery = $(
         `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
@@ -68,9 +74,9 @@ function populateShows(shows) {
  *    Hide episodes area (that only gets shown if they ask for episodes)
  */
 
-async function searchForShowAndDisplay() {
-  const term = $("#searchForm-term").val();
-  const shows = await getShowsByTerm(term);
+async function searchForShowAndDisplay(): Promise<void> {
+  const term: string  = $("#searchForm-term").val() as string;
+  const shows: ShowInterface[] = await getShowsByTerm(term);
 
   $episodesArea.hide();
   populateShows(shows);
