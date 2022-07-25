@@ -10,7 +10,14 @@ interface ShowInterface {
   id: number,
   name: string,
   summary: string,
-  image: string
+  image: Record<string,string>
+};
+
+interface EpisodeInterface {
+  id: number,
+  name: string,
+  season: string,
+  number: string
 };
 
 /** Given a search term, search for tv shows that match that query.
@@ -27,21 +34,12 @@ async function getShowsByTerm(term: string): Promise<ShowInterface[]> {
 
   const shows:Record<string,any> = response.data;
 
-
-
-
-
-
-
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
   return shows.map((show:Record<string,any>) =>{ return{
     id: show.show.id,
     name:show.show.name,
     summary: show.show.summary,
     image:show.show.image
-  }
-}
-  )
+  }});
 
 }
 /** Given list of shows, create markup for each and to DOM */
@@ -50,12 +48,13 @@ function populateShows(shows: ShowInterface[]): void {
   $showsList.empty();
 
   for (let show of shows) {
+    console.log('image =', show.image);
     const $show: JQuery = $(
         `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg"
-              alt="Bletchly Circle San Francisco"
+              src=${show.image.original}
+              alt=${show.name}
               class="w-25 me-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
@@ -94,8 +93,45 @@ $searchForm.on("submit", async function (evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+// async function getEpisodesOfShow(id:number): Promise<EpisodeInterface[]> { 
+//   const response = await axios.get(`${TVMAZE_API_URL}shows/${id}/episodes`);
+//   const shows = response.data;
+
+//   return shows.map((show: Record<string, any>) => {
+//     return {
+//       id: show.id,
+//       name: show.name,
+//       season: show.season,
+//       number: show.number
+//     }
+//   });
+// }
 
 /** Write a clear docstring for this function... */
 
-// function populateEpisodes(episodes) { }
+function populateEpisodes(episodes) { 
+  $showsList.empty();
+
+  for (let show of shows) {
+    console.log('image =', show.image);
+    const $show: JQuery = $(
+      `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
+         <div class="media">
+           <img
+              src=${show.image.original}
+              alt=${show.name}
+              class="w-25 me-3">
+           <div class="media-body">
+             <h5 class="text-primary">${show.name}</h5>
+             <div><small>${show.summary}</small></div>
+             <button class="btn btn-outline-light btn-sm Show-getEpisodes">
+               Episodes
+             </button>
+           </div>
+         </div>
+       </div>
+      `);
+
+    $showsList.append($show);
+  }
+}
